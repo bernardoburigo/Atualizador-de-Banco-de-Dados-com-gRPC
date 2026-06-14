@@ -1,0 +1,19 @@
+{
+  "name": "grpc-migrations",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "sh scripts/build.sh",
+    "start:coordinator": "sh scripts/run.sh coordinator",
+    "start:worker": "sh scripts/run.sh worker",
+    "start:client": "sh scripts/run.sh client"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

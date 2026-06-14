@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package migration;
+
+// ─────────────────────────────────────────────────────────────
+// Serviço exposto pelo Coordinator ao Client (CLI)
+// ─────────────────────────────────────────────────────────────
+service CoordinatorService {
+  // Recebe um arquivo .sql em chunks e o distribui para todos os workers
+  rpc UploadMigration(stream MigrationChunk) returns (MigrationResult);
+  // Retorna o histórico de migrations aplicadas (agrega resultado dos workers)
+  rpc ListMigrations(Empty) returns (MigrationList);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Serviço exposto pelo Worker ao Coordinator (B2B)
+// ─────────────────────────────────────────────────────────────
+service WorkerService {
+  // Recebe um arquivo .sql em chunks e o aplica no SQLite local
+  rpc ApplyMigration(stream MigrationChunk) returns (ApplyResult);
+  // Retorna as migrations já aplicadas neste worker
+  rpc ListMigrations(Empty) returns (MigrationList);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Mensagens compartilhadas
+// ─────────────────────────────────────────────────────────────
+
+message Empty {}
+
+// Um chunk de arquivo enviado via streaming
+message MigrationChunk {
+  string migration_id = 1; // identificador único da migration (ex: "001_create_users")
+  string filename     = 2; // nome do arquivo original
+  bytes  content      = 3; // conteúdo binário do chunk
+  bool   is_last      = 4; // indica que este é o último chunk
+}
+
+// Resultado retornado pelo Coordinator ao Client
+message MigrationResult {
+  bool   success              = 1;
+  string message              = 2;
+  repeated WorkerResult workers = 3;
+}
+
+// Resultado individual de cada Worker
+message WorkerResult {
+  string worker_address = 1;
+  bool   success        = 2;
+  string message        = 3;
+}
+
+// Resultado retornado pelo Worker ao Coordinator
+message ApplyResult {
+  bool   success = 1;
+  string message = 2;
+}
+
+// Lista de migrations
+message MigrationList {
+  repeated MigrationEntry entries = 1;
+}
+
+// Uma entrada no histórico de migrations
+message MigrationEntry {
+  string migration_id = 1;
+  string filename     = 2;
+  string applied_at   = 3;
+}
