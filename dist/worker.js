@@ -24563,6 +24563,7 @@ var workerServiceImpl = {
 var PORT = process.env.WORKER_PORT ?? "50052";
 var WORKER_ID = process.env.WORKER_ID ?? "worker-default";
 var ADDRESS = `0.0.0.0:${PORT}`;
+process.on("SIGHUP", () => process.exit(0));
 var server = new grpc2.Server();
 server.addService(
   migrationProto.migration.WorkerService.service,

@@ -66,7 +66,6 @@ sh scripts/run.sh client list
 | `005_populate_products.sql` | Insere 5 produtos mock em `products` |
 | `006_fresh_reset.sql` | Reverte tudo: apaga tabelas, dados e limpa o histórico em `_migrations` (mantém apenas o registro da própria 006) |
 
-> **006 na prática:** após o reset, basta rodar `upload ./migrations` novamente para reaplicar do zero — as migrations 001–005 não constam mais no histórico.
 
 ## Comportamento esperado
 

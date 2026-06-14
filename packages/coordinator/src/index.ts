@@ -5,6 +5,9 @@ import { coordinatorServiceImpl } from "./coordinator.service";
 const PORT = process.env.COORDINATOR_PORT ?? "50051";
 const ADDRESS = `0.0.0.0:${PORT}`;
 
+// Encerra o processo quando o terminal for fechado (SIGHUP)
+process.on("SIGHUP", () => process.exit(0));
+
 const server = new grpc.Server();
 
 server.addService(

@@ -24589,6 +24589,7 @@ ${summary}`);
 // packages/coordinator/src/index.ts
 var PORT = process.env.COORDINATOR_PORT ?? "50051";
 var ADDRESS = `0.0.0.0:${PORT}`;
+process.on("SIGHUP", () => process.exit(0));
 var server = new grpc3.Server();
 server.addService(
   migrationProto.migration.CoordinatorService.service,

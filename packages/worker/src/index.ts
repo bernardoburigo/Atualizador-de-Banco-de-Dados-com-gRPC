@@ -6,6 +6,9 @@ const PORT = process.env.WORKER_PORT ?? "50052";
 const WORKER_ID = process.env.WORKER_ID ?? "worker-default";
 const ADDRESS = `0.0.0.0:${PORT}`;
 
+// Encerra o processo quando o terminal for fechado (SIGHUP)
+process.on("SIGHUP", () => process.exit(0));
+
 const server = new grpc.Server();
 
 server.addService(
