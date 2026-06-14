@@ -24502,10 +24502,10 @@ function isMigrationApplied(migrationId) {
 }
 function applyMigration(migrationId, filename, sql) {
   db.transaction(() => {
-    db.exec(sql);
     db.prepare(
       "INSERT INTO _migrations (migration_id, filename, applied_at) VALUES (?, ?, ?)"
     ).run(migrationId, filename, (/* @__PURE__ */ new Date()).toISOString());
+    db.exec(sql);
   })();
 }
 function listAppliedMigrations() {

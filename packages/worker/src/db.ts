@@ -37,10 +37,12 @@ export function applyMigration(
   sql: string
 ): void {
   db.transaction(() => {
-    db.exec(sql);
+    // Registra antes de executar o SQL. Se o SQL apagar _migrations (ex: reset),
+    // este registro some junto — sem rastro, sem bloqueio de idempotência.
     db.prepare(
       "INSERT INTO _migrations (migration_id, filename, applied_at) VALUES (?, ?, ?)"
     ).run(migrationId, filename, new Date().toISOString());
+    db.exec(sql);
   })();
 }
 
