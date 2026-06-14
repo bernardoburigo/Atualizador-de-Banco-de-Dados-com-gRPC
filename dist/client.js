@@ -27547,13 +27547,14 @@ async function listMigrations() {
 // packages/client/src/index.ts
 var program2 = new Command();
 program2.name("grpc-migrate").description("Cliente CLI para aplicar migrations via gRPC").version("1.0.0");
-program2.command("upload <dir>").description("Envia todos os arquivos .sql de um diret\xF3rio para o coordinator").action(async (dir) => {
+program2.command("upload <dir>").description("Envia arquivos .sql de um diret\xF3rio para o coordinator").option("--only <prefixos>", "Envia apenas os arquivos cujo nome come\xE7a com os prefixos informados (separados por v\xEDrgula). Ex: --only 001,002,003").action(async (dir, opts) => {
   const absDir = import_path2.default.resolve(dir);
   if (!import_fs.default.existsSync(absDir)) {
     console.error(`Diret\xF3rio n\xE3o encontrado: ${absDir}`);
     process.exit(1);
   }
-  const files = import_fs.default.readdirSync(absDir).filter((f) => f.endsWith(".sql")).sort();
+  const prefixes = opts.only ? opts.only.split(",").map((p) => p.trim()).filter(Boolean) : null;
+  const files = import_fs.default.readdirSync(absDir).filter((f) => f.endsWith(".sql")).filter((f) => prefixes === null || prefixes.some((p) => f.startsWith(p))).sort();
   if (files.length === 0) {
     console.log("Nenhum arquivo .sql encontrado.");
     return;

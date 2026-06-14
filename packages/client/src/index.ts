@@ -12,8 +12,9 @@ program
 
 program
   .command("upload <dir>")
-  .description("Envia todos os arquivos .sql de um diretório para o coordinator")
-  .action(async (dir: string) => {
+  .description("Envia arquivos .sql de um diretório para o coordinator")
+  .option("--only <prefixos>", "Envia apenas os arquivos cujo nome começa com os prefixos informados (separados por vírgula). Ex: --only 001,002,003")
+  .action(async (dir: string, opts: { only?: string }) => {
     const absDir = path.resolve(dir);
 
     if (!fs.existsSync(absDir)) {
@@ -21,9 +22,14 @@ program
       process.exit(1);
     }
 
+    const prefixes = opts.only
+      ? opts.only.split(",").map((p) => p.trim()).filter(Boolean)
+      : null;
+
     const files = fs
       .readdirSync(absDir)
       .filter((f) => f.endsWith(".sql"))
+      .filter((f) => prefixes === null || prefixes.some((p) => f.startsWith(p)))
       .sort(); // ordem alfabética garante sequência
 
     if (files.length === 0) {

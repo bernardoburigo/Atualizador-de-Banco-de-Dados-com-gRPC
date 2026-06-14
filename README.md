@@ -40,27 +40,46 @@ WORKER_URLS=localhost:50052,localhost:50053 sh scripts/run.sh coordinator
 ### 4. Aplicar migrations
 
 ```bash
-# Terminal 4 — enviar todos os .sql do diretório migrations/
-sh scripts/run.sh client upload ./migrations
+# Criar estrutura (tabelas users e products)
+sh scripts/run.sh client upload ./migrations --only 001,002,003
+
+# Popular com dados mock
+sh scripts/run.sh client upload ./migrations --only 004,005
+
+# Reverter tudo (apaga tabelas, dados e histórico — mantém só o registro do reset)
+sh scripts/run.sh client upload ./migrations --only 006
 
 # Listar migrations aplicadas
 sh scripts/run.sh client list
 ```
 
+> A opção `--only` filtra por prefixo de nome de arquivo e aceita múltiplos valores separados por vírgula.
+
+## Migrations disponíveis
+
+| Arquivo | O que faz |
+|---|---|
+| `001_create_users.sql` | Cria a tabela `users` |
+| `002_add_email_column.sql` | Adiciona coluna `email` e índice único em `users` |
+| `003_create_products.sql` | Cria a tabela `products` |
+| `004_populate_users.sql` | Insere 5 usuários mock em `users` |
+| `005_populate_products.sql` | Insere 5 produtos mock em `products` |
+| `006_fresh_reset.sql` | Reverte tudo: apaga tabelas, dados e limpa o histórico em `_migrations` (mantém apenas o registro da própria 006) |
+
+> **006 na prática:** após o reset, basta rodar `upload ./migrations` novamente para reaplicar do zero — as migrations 001–005 não constam mais no histórico.
+
 ## Comportamento esperado
 
 ```
-Enviando 3 migration(s) para o coordinator...
+Enviando 6 migration(s) para o coordinator...
 
   → 001_create_users.sql ... ✓ OK
     ✓ [localhost:50052] Migration '001_create_users.sql' aplicada com sucesso.
     ✓ [localhost:50053] Migration '001_create_users.sql' aplicada com sucesso.
   ...
-
-Migrations aplicadas:
-  ID                    Arquivo                  Aplicada em
-  001_create_users      001_create_users.sql     2026-06-14T20:13:47.395Z
-  ...
+  → 006_fresh_reset.sql ... ✓ OK
+    ✓ [localhost:50052] Migration '006_fresh_reset.sql' aplicada com sucesso.
+    ✓ [localhost:50053] Migration '006_fresh_reset.sql' aplicada com sucesso.
 ```
 
 ## Idempotência
