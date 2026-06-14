@@ -2,6 +2,8 @@
 
 Sistema distribuído de aplicação de migrations SQL usando gRPC (Node.js / TypeScript).
 
+**Grupo: Bernardo Búrigo, Bruno Baldessar, Gabriel Waltrick e Victor Antônio**
+
 ### Fluxo
 1. O **Client** lê arquivos `.sql` de um diretório e envia cada um ao Coordinator via **client-streaming RPC**.
 2. O **Coordinator** recebe o arquivo em chunks e distribui a todos os workers em paralelo via **client-streaming RPC** (comunicação B2B).
